@@ -28,48 +28,50 @@ var fs = require("fs");
 // Require moment js to format Date of the Event for Bands In Town
 var moment = require("moment");
 
-// Declare agrument value index to capture user input parameters
-const command = process.argv[2];
-const userInput = process.argv[3];
+// Initialise Spotify npm specific call to get keys to spotify account
+var spotify = new Spotify(keys.spotify);
 
+// Capture user input parameters
+var command = process.argv[2];
+var userInput = process.argv[3];
 
 /* --------- *\
 |* Functions *|
 \* --------- */
 
-// Switch case
-switch (command, userInput) {
+// Switch case statement
+switch (command) {
     case "concert-this":
-        bands(userInput);
+        myConcert();
         break;
 
     case "spotify-this-song":
-        spotify(userInput);
+        mySpotify();
         break;
 
     case "movie-this":
-        omdb(userInput);
+        myOmdb();
         break;
 
     case "do-what-it-says":
-        doSay();
+        random();
         break;
 
     default:
-        console.log("Invalid command. Try again.");
-        console.log("Commands available: concert-this | movie-this | spotify-this-song | do-what-it-says")
-};
+        console.log("Invalid command. Please select a command listed below:");
+        console.log("concert-this | movie-this | spotify-this-song | do-what-it-says");
+}
 
 
 /* --- BANDS IN TOWN --- */
-// Command line: node liri.js concert-this <artist/band name here> 
+// Command line: `node liri.js concert-this <artist/band name here>`
 // Render the following information: 
 // 1. Name of the venue
 // 2. Venue location
 // 3. Date of the Event (use moment to format this as "MM/DD/YYYY")
 // queryURL: https://rest.bandsintown.com/artists/circa%20survive/events?app_id=codingbootcamp
 
-function bands(artist) {
+function myConcert(artist) {
     var queryUrl = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
 
     request(queryUrl, function (error, response, body) {
@@ -77,42 +79,46 @@ function bands(artist) {
         if (!error && response.statusCode === 200) {
             var concertData = JSON.parse(body);
             var momentDateTime = moment().format('L');
+            console.log("================| MY CONCERT RESULTS|================");
             console.log("1. Venue: " + concertData[0].venue.name);
             console.log("2. Location: " + concertData[0].venue.city + "," + concertData[0].venue.country);
             console.log("3. Date: " + momentDateTime);
+            console.log("=============================================");
         }
     });
 }
 
 /* --- SPOTIFY --- */
-// Command line: node liri.js spotify-this-song '<song name here>'
+// Command line: `node liri.js spotify-this-song <song name here>`
 // Render the following information: 
 // 1. Artist(s)
 // 2. The song's name
 // 3. A preview link of the song from Spotify
 // 4. The album that the song is from
 
-function spotify(song) {
+function mySpotify(song) {
     spotify
-    .search({ type: "track", query: song, limit: 1 })
-    .then (function (error, data) {
-        // If no error loop through song database
-        if (!error) {
-            for (var i = 0; i < data.tracks.items.length; i++) {
-                var songData = data.tracks.items[i];
-                console.log("1. Artist: " + songData.artists[0].name);
-                console.log("2. Song: " + songData.name);
-                console.log("3. Preview URL: " + songData.preview_url);
-                console.log("4. Album: " + songData.album.name);
+        .search({ type: "track", query: song, limit: 1 })
+        .then(function (err, data) {
+            // If no error loop through song database
+            if (!err) {
+                var songData = data.tracks.items[0];
+                for (var i = 0; i < songData.length; i++) {
+                    console.log("================| MY SONG RESULTS |================");
+                    console.log("1. Artist: " + songData.artists[0].name);
+                    console.log("2. Song: " + songData.name);
+                    console.log("3. Preview URL: " + songData.preview_url);
+                    console.log("4. Album: " + songData.album.name);
+                    console.log("=============================================");
+                }
+            } else {
+                console.log("No results found " + err);
             }
-        } else {
-            console.log("Not results found" + err);
-        }
-    });
+        });
 }
 
 /* --- OMDB --- */
-// Command line: node liri.js movie-this '<movie name here>'
+// Command line: `node liri.js movie-this <movie name here>`
 // Render the following information: 
 // 1. Title of the movie
 // 2. Year the movie came out
@@ -123,27 +129,29 @@ function spotify(song) {
 // 7. Plot of the movie
 // 8. Actors in the movie
 
-function omdb(movie) {
-    var omdbURL = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
+function myOmdb(movie) {
+    var queryURL = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
 
-    request(omdbURL, function (error, response, body) {
+    request(queryURL, function (error, response, body) {
         // If no error and request is successful, parse the data to become an object
         if (!error && response.statusCode == 200) {
-            var body = JSON.parse(body);
-            console.log("1. Title: " + body.Title);
-            console.log("2. Release Year: " + body.Year);
-            console.log("3. IMdB Rating: " + body.imdbRating);
-            console.log("4. Rotten Tomatoes Rating: " + body.tomatoRating);
-            console.log("5. Country: " + body.Country);
-            console.log("6. Language: " + body.Language);
-            console.log("7. Plot: " + body.Plot);
-            console.log("8. Actors: " + body.Actors);
+            var content = JSON.parse(body);
+            console.log("=====================| MY MOVIE RESULTS |=====================");
+            console.log("1. Title: " + content.Title);
+            console.log("2. Release Year: " + content.Year);
+            console.log("3. IMdB Rating: " + content.imdbRating);
+            console.log("4. Rotten Tomatoes Rating: " + content.Ratings[1].Value);
+            console.log("5. Country: " + content.Country);
+            console.log("6. Language: " + content.Language);
+            console.log("7. Plot: " + content.Plot);
+            console.log("8. Actors: " + content.Actors);
+            console.log("=======================================================");
         } else {
-            console.log("Error occurred.")
+            console.log("No results found " + err)
         }
         // If user does not type a movie, output data for the movie 'Mr. Nobody'
         if (movie === null) {
-            console.log("If you haven't watched 'Mr. Nobody,' then you should: http://www.imdb.com/title/tt0485947/");
+            console.log("If you haven't watched 'Mr. Nobody', then you should: http://www.imdb.com/title/tt0485947/");
             console.log("It's on Netflix!");
         }
     });
@@ -155,10 +163,10 @@ function omdb(movie) {
 // 1. LIRI take text inside random.txt to use it to call one of LIRI's commands
 // 2. Run spotify-this-song for "I Want it That Way"
 
-function doSay() {
+function random() {
     // Run file system to grab random.text and spotify the song in the text file
     fs.readFile("random.txt", "utf8", function (error, data) {
         var text = data.split(",");
-        spotifySong(text[1]);
+        helloLiri(text[0], text[1]);
     });
 };
