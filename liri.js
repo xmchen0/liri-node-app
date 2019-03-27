@@ -20,7 +20,7 @@ var keys = require("./keys.js");
 var Spotify = require("node-spotify-api");
 
 // Require to install axios package to retrieve data from OMDB API and Bands In Town API
-var axios = require("axios"); 
+var axios = require("axios");
 
 // Require built-in file system node package
 var fs = require("fs");
@@ -38,37 +38,36 @@ const userInput = process.argv[3];
 \* --------- */
 
 // Main process function
-function switchFunction {
-    switch (command) {
-        case "concert-this":
-            getBands(userInput);
-            break;
+switch (command) {
+    case "concert-this":
+        getBands(userInput);
+        break;
 
-        case "spotify-this-song":
-            if (userInput) {
-                spotifyThisSong(userInput);
-            } else {
-                spotifyThisSong("The Sign");
-            }
-            break;
+    case "spotify-this-song":
+        if (userInput) {
+            spotifyThisSong(userInput);
+        } else {
+            spotifyThisSong("The Sign");
+        }
+        break;
 
-        case "movie-this":
-            if (userInput) {
-                omdb(userInput);
-            } else {
-                omdb("Mr. Nobody");
-            }
-            break;
+    case "movie-this":
+        if (userInput) {
+            omdb(userInput);
+        } else {
+            omdb("Mr. Nobody");
+        }
+        break;
 
-        case "do-what-it-says":
-            doThing();
-            break;
+    case "do-what-it-says":
+        doThing();
+        break;
 
-        default:
-            display('Error occurred.');
-            break;
-    }
+    default:
+        display("Error occurred.");
+        break;
 };
+
 
 // BANDS IN TOWN
 // Command line: node liri.js concert-this <artist/band name here> 
@@ -100,10 +99,40 @@ function switchFunction {
 // 7. Plot of the movie
 // 8. Actors in the movie
 
+function omdb(movie) {
+    var omdbURL = 'http://www.omdbapi.com/?t=' + movie + '&y=&plot=short&apikey=trilogy';
 
-// DO THING
+    request(omdbURL, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            var body = JSON.parse(body);
+            console.log("1. Title: " + body.Title);
+            console.log("2. Release Year: " + body.Year);
+            console.log("3. IMdB Rating: " + body.imdbRating);
+            console.log("4. Rotten Tomatoes Rating: " + body.tomatoRating);
+            console.log("5. Country: " + body.Country);
+            console.log("6. Language: " + body.Language);
+            console.log("7. Plot: " + body.Plot);
+            console.log("8. Actors: " + body.Actors);
+        } else {
+            console.log("Error occurred.")
+        }
+        if (movie === "Mr. Nobody") {
+            console.log("If you haven't watched 'Mr. Nobody,' then you should: http://www.imdb.com/title/tt0485947/");
+            console.log("It's on Netflix!");
+        }
+    });
+};
+
+// DO WHAT IT SAYS
 // Command line: node liri.js do-what-it-says
 // Render the following information: 
 // 1. LIRI take text inside random.txt to use it to call one of LIRI's commands
 // 2. Run spotify-this-song for "I Want it That Way"
+
+function doThing() {
+    fs.readFile("random.txt", "utf8", function (error, data) {
+        var text = data.split(",");
+        spotifyThisSong(text[1]);
+    });
+};
 
