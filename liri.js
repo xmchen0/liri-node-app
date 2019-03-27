@@ -28,7 +28,7 @@ var fs = require("fs");
 // Require moment js to format Date of the Event for Bands In Town
 var moment = require("moment");
 
-// Declare agrument value index for command and user input parameters
+// Declare agrument value index to capture user input parameters
 const command = process.argv[2];
 const userInput = process.argv[3];
 
@@ -37,35 +37,27 @@ const userInput = process.argv[3];
 |* Functions *|
 \* --------- */
 
-// Main process function
-switch (command) {
+// Switch case
+switch (command, userInput) {
     case "concert-this":
-        getBands(userInput);
+        bands(userInput);
         break;
 
     case "spotify-this-song":
-        if (userInput) {
-            spotifySong(userInput);
-        } else {
-            spotifySong("The Sign Ace of Base");
-        }
+        spotify(userInput);
         break;
 
     case "movie-this":
-        if (userInput) {
-            omdb(userInput);
-        } else {
-            omdb("Mr. Nobody");
-        }
+        omdb(userInput);
         break;
 
     case "do-what-it-says":
-        doThing();
+        doSay();
         break;
 
     default:
-        display("Error occurred.");
-        break;
+        console.log("Invalid command. Try again.");
+        console.log("Commands available: concert-this | movie-this | spotify-this-song | do-what-it-says")
 };
 
 
@@ -77,18 +69,20 @@ switch (command) {
 // 3. Date of the Event (use moment to format this as "MM/DD/YYYY")
 // queryURL: https://rest.bandsintown.com/artists/circa%20survive/events?app_id=codingbootcamp
 
-var queryUrl = "https://rest.bandsintown.com/artists/" + bandQuery + "/events?app_id=codingbootcamp#";
+function bands(artist) {
+    var queryUrl = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
 
-request(queryUrl, function (error, response, body) {
-    // If no error and request is successful
-    if (!error && response.statusCode === 200) {
-        var concertData = JSON.parse(body);
-        var momentDT = moment().format('L');
-        console.log("1. Venue: " + concertData[0].venue.name);
-        console.log("2. Location: " + concertData[0].venue.city + "," + concertData[0].venue.country);
-        console.log("3. Date: " + momentDT);
-    }
-});
+    request(queryUrl, function (error, response, body) {
+        // If no error and request is successful
+        if (!error && response.statusCode === 200) {
+            var concertData = JSON.parse(body);
+            var momentDateTime = moment().format('L');
+            console.log("1. Venue: " + concertData[0].venue.name);
+            console.log("2. Location: " + concertData[0].venue.city + "," + concertData[0].venue.country);
+            console.log("3. Date: " + momentDateTime);
+        }
+    });
+}
 
 /* --- SPOTIFY --- */
 // Command line: node liri.js spotify-this-song '<song name here>'
@@ -98,8 +92,10 @@ request(queryUrl, function (error, response, body) {
 // 3. A preview link of the song from Spotify
 // 4. The album that the song is from
 
-function spotifySong(song) {
-    spotify.search({ type: "track", query: song }, function (error, data) {
+function spotify(song) {
+    spotify
+    .search({ type: "track", query: song, limit: 1 })
+    .then (function (error, data) {
         // If no error loop through song database
         if (!error) {
             for (var i = 0; i < data.tracks.items.length; i++) {
@@ -110,7 +106,7 @@ function spotifySong(song) {
                 console.log("4. Album: " + songData.album.name);
             }
         } else {
-            console.log('Error occurred.');
+            console.log("Not results found" + err);
         }
     });
 }
@@ -128,7 +124,7 @@ function spotifySong(song) {
 // 8. Actors in the movie
 
 function omdb(movie) {
-    var omdbURL = 'http://www.omdbapi.com/?t=' + movie + '&y=&plot=short&apikey=trilogy';
+    var omdbURL = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
 
     request(omdbURL, function (error, response, body) {
         // If no error and request is successful, parse the data to become an object
@@ -146,7 +142,7 @@ function omdb(movie) {
             console.log("Error occurred.")
         }
         // If user does not type a movie, output data for the movie 'Mr. Nobody'
-        if (movie === "Mr. Nobody") {
+        if (movie === null) {
             console.log("If you haven't watched 'Mr. Nobody,' then you should: http://www.imdb.com/title/tt0485947/");
             console.log("It's on Netflix!");
         }
@@ -159,7 +155,7 @@ function omdb(movie) {
 // 1. LIRI take text inside random.txt to use it to call one of LIRI's commands
 // 2. Run spotify-this-song for "I Want it That Way"
 
-function doThing() {
+function doSay() {
     // Run file system to grab random.text and spotify the song in the text file
     fs.readFile("random.txt", "utf8", function (error, data) {
         var text = data.split(",");
