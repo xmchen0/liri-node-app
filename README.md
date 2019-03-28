@@ -50,7 +50,7 @@ node liri.js spotify-this-song <song name here>
 ```
 node liri.js movie-this <movie name here>
 ```
-![movie-this](https://i.ibb.co/R6kFY85/Screen-Shot-2019-03-28-at-12-51-14-am.png)
+![movie-this](https://i.ibb.co/D9SDVtN/Screen-Shot-2019-03-28-at-11-53-59-am.png)
 
 ```
 node liri.js do-what-it-says
