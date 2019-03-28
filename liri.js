@@ -182,3 +182,12 @@ function random() {
         mySpotify(text[1]);
     });
 };
+
+
+/* --- BONUS (attempted) --- */
+// function outputData(dataLog) {
+//     // Append each command ran to the log.txt file
+//     fs.appendFile("./log.txt", dataLog + function (err) {
+//         if (err) return outputData("Error logging data to file: " + err);
+//     });
+// }
