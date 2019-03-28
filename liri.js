@@ -28,15 +28,15 @@ var fs = require("fs");
 // Require moment js to format Date of the Event for Bands In Town
 var moment = require("moment");
 
-// Require request for Spotify
+// Require request for Bands In Town and OMDB queryURL
 var request = require("request");
 
 // Initialise Spotify npm specific call to get keys to spotify account
 var spotify = new Spotify(keys.spotify);
 
 // Capture user input parameters
-var command = process.argv[2];
-var userInput = process.argv[3];
+const command = process.argv[2];
+const userInput = process.argv[3];
 
 /* --------- *\
 |* Functions *|
@@ -83,9 +83,9 @@ function myConcert(artist) {
             var concertData = JSON.parse(body);
             var momentDateTime = moment().format('L');
             console.log(" ");
-            console.log("================| MY CONCERT RESULTS|================");
+            console.log("================| MY CONCERT RESULT |================");
             console.log("1. Venue: " + concertData[0].venue.name);
-            console.log("2. Location: " + concertData[0].venue.city + "," + concertData[0].venue.country);
+            console.log("2. Location: " + concertData[0].venue.city + ", " + concertData[0].venue.country);
             console.log("3. Date: " + momentDateTime);
             console.log("=====================================================");
             console.log(" ");
@@ -108,16 +108,17 @@ function mySpotify(song) {
         song = "'The Sign' by Ace of Base";
     }
     spotify.search({ type: "track", query: song, limit: 1 }, function (err, data) {
+        // If no error loop through tracks of songs
         if (!err) {
             for (var i = 0; i < data.tracks.items.length; i++) {
                 var songData = data.tracks.items[0];
                 console.log(" ");
-                console.log("================| MY SONG RESULTS |================");
+                console.log("================| MY SONG RESULT |================");
                 console.log("1. Artist: " + songData.artists[0].name);
                 console.log("2. Song: " + songData.name);
                 console.log("3. Preview URL: " + songData.preview_url);
                 console.log("4. Album: " + songData.album.name);
-                console.log("===================================================");
+                console.log("==================================================");
                 console.log(" ");
             }
         } else {
@@ -151,7 +152,7 @@ function myOmdb(movie) {
         if (!err && response.statusCode == 200) {
             var content = JSON.parse(body);
             console.log(" ");
-            console.log("=====================| MY MOVIE RESULTS |=====================");
+            console.log("=====================| MY MOVIE RESULT |=====================");
             console.log("1. Title: " + content.Title);
             console.log("2. Release Year: " + content.Year);
             console.log("3. IMDB Rating: " + content.imdbRating);
