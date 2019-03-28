@@ -156,7 +156,7 @@ function myOmdb(movie) {
             console.log("1. Title: " + content.Title);
             console.log("2. Release Year: " + content.Year);
             console.log("3. IMDB Rating: " + content.imdbRating);
-            console.log("4. Rotten Tomatoes Rating: " + content.Ratings[1]);
+            console.log("4. Rotten Tomatoes Rating: " + content.Ratings[1].Value);
             console.log("5. Country: " + content.Country);
             console.log("6. Language: " + content.Language);
             console.log("7. Plot: " + content.Plot);
@@ -170,7 +170,7 @@ function myOmdb(movie) {
 };
 
 /* --- DO WHAT IT SAYS --- */
-// Command line: node liri.js do-what-it-says
+// Command line: `node liri.js do-what-it-says`
 // Render the following information: 
 // 1. LIRI take text inside random.txt to use it to call one of LIRI's commands
 // 2. Run spotify-this-song for "I Want it That Way"
