@@ -81,14 +81,16 @@ function myConcert(artist) {
         // If no error and request is successful
         if (!err && response.statusCode === 200) {
             var concertData = JSON.parse(body);
-            var momentDateTime = moment().format('L');
-            console.log(" ");
-            console.log("================| MY CONCERT RESULT |================");
-            console.log("1. Venue: " + concertData[0].venue.name);
-            console.log("2. Location: " + concertData[0].venue.city + ", " + concertData[0].venue.country);
-            console.log("3. Date: " + momentDateTime);
-            console.log("=====================================================");
-            console.log(" ");
+            // console.log(concertData);
+            for (var i = 0; i < concertData.length; i++) {
+                console.log(" ");
+                console.log("================| MY CONCERT RESULTS |================");
+                console.log("1. Venue: " + concertData[i].venue.name);
+                console.log("2. Location: " + concertData[i].venue.city + ", " + concertData[i].venue.country);
+                console.log("3. Date: " + moment(concertData.datetime).format("MM/DD/YYYY")); // not working well
+                console.log("=====================================================");
+                console.log(" ");
+            }
         } else {
             console.log("No results found " + err);
         }
@@ -104,6 +106,7 @@ function myConcert(artist) {
 // 4. The album that the song is from
 
 function mySpotify(song) {
+    // If no songs entered, default to "The Sign" by Ace of Base
     if (song === undefined || null) {
         song = "'The Sign' by Ace of Base";
     }
@@ -111,10 +114,10 @@ function mySpotify(song) {
         // If no error loop through tracks of songs
         if (!err) {
             for (var i = 0; i < data.tracks.items.length; i++) {
-                var songData = data.tracks.items[0];
+                var songData = data.tracks.items[i];
                 console.log(" ");
                 console.log("================| MY SONG RESULT |================");
-                console.log("1. Artist: " + songData.artists[0].name);
+                console.log("1. Artist: " + songData.artists[i].name);
                 console.log("2. Song: " + songData.name);
                 console.log("3. Preview URL: " + songData.preview_url);
                 console.log("4. Album: " + songData.album.name);
