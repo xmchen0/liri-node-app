@@ -11,7 +11,7 @@ LIRI stands for Language Interpretation and Recognition Interface. LIRI is a com
 https://youtu.be/mys_RsMbCaE
 
 * Watch on YouTube
-* Length: 1:30
+* Length: 1:20
 * No audio
 
 ## Getting Started
