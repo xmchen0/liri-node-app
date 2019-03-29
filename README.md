@@ -55,5 +55,6 @@ This project is licensed under the MIT License.
 
 # Acknowledgement
 
-TA's - Adrian Pearman and Dimitry Besson
-UofT Boot Camp 2019
+* TA's - Adrian Pearman and Dimitry Besson
+
+* UofT Boot Camp 2019
