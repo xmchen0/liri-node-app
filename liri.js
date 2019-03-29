@@ -28,9 +28,6 @@ var fs = require("fs");
 // Require moment js to format Date of the Event for Bands In Town
 var moment = require("moment");
 
-// Require request for Bands In Town and OMDB queryURL
-var request = require("request");
-
 // Initialise Spotify npm specific call to get keys to spotify account
 var spotify = new Spotify(keys.spotify);
 
@@ -43,27 +40,29 @@ const userInput = process.argv[3];
 \* --------- */
 
 // Switch case statement
-switch (command) {
-    case "concert-this":
-        myConcert(userInput);
-        break;
+function switchCase() {
+    switch (command) {
+        case "concert-this":
+            myConcert(userInput);
+            break;
 
-    case "spotify-this-song":
-        mySpotify(userInput);
-        break;
+        case "spotify-this-song":
+            mySpotify(userInput);
+            break;
 
-    case "movie-this":
-        myOmdb(userInput);
-        break;
+        case "movie-this":
+            myOmdb(userInput);
+            break;
 
-    case "do-what-it-says":
-        random();
-        break;
+        case "do-what-it-says":
+            random();
+            break;
 
-    default:
-        console.log("Invalid command. Please select a command listed below:");
-        console.log("concert-this | movie-this | spotify-this-song | do-what-it-says");
-}
+        default:
+            console.log("Invalid command. Please select a command listed below:");
+            console.log("concert-this | movie-this | spotify-this-song | do-what-it-says");
+    }
+};
 
 
 /* --- BANDS IN TOWN --- */
@@ -75,27 +74,27 @@ switch (command) {
 // queryURL: https://rest.bandsintown.com/artists/circa%20survive/events?app_id=codingbootcamp
 
 function myConcert(artist) {
-    var queryUrl = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
+    var queryURL = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp";
 
-    request(queryUrl, function (err, response, body) {
-        // If no error and request is successful
-        if (!err && response.statusCode === 200) {
-            var concertData = JSON.parse(body);
-            // console.log(concertData);
-            for (var i = 0; i < concertData.length; i++) {
-                console.log(" ");
-                console.log("================| MY CONCERT RESULTS |================");
-                console.log("1. Venue: " + concertData[i].venue.name);
-                console.log("2. Location: " + concertData[i].venue.city + ", " + concertData[i].venue.country);
-                console.log("3. Date: " + moment(concertData.datetime).format("MM/DD/YYYY")); // not working well
-                console.log("=====================================================");
-                console.log(" ");
+    axios.get(queryURL).then(
+        function (response, err) {
+            if (!err) {
+                for (var i = 0; i < response.data.length; i++) {
+                    var concertData = response.data;
+                    console.log(" ");
+                    console.log("================| MY CONCERT RESULTS |================");
+                    console.log("1. Venue: " + concertData[i].venue.name);
+                    console.log("2. Location: " + concertData[i].venue.city + ", " + concertData[i].venue.country);
+                    console.log("3. Date and Time: " + moment(response.data[i].datetime, 'YYYY-MM-DDTHH:mm:ss').format('MM/DD/YYYY, h:mm A'));
+                    console.log("======================================================");
+                    console.log(" ");
+                }
+            } else {
+                console.log("No results found " + err);
             }
-        } else {
-            console.log("No results found " + err);
-        }
-    });
+        });
 }
+
 
 /* --- SPOTIFY --- */
 // Command line: `node liri.js spotify-this-song <song name here>`
@@ -145,32 +144,36 @@ function mySpotify(song) {
 
 function myOmdb(movie) {
     // If user does not type a movie, output data for the movie 'Mr. Nobody'
-    if (movie === undefined || null) {
+    if (movie === undefined) {
         console.log("If you haven't watched 'Mr. Nobody', then you should: http://www.imdb.com/title/tt0485947/");
         console.log("It's on Netflix!");
+    } else {
+        console.log(movie)
+        var queryURL = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
+
+        axios.get(queryURL).then(
+            function (response, err) {
+                if (!err) {
+                    var movieData = response.data;
+                    console.log(" ");
+                    console.log("=====================| MY MOVIE RESULT |=====================");
+                    console.log("1. Title: " + movieData.Title);
+                    console.log("2. Release Year: " + movieData.Year);
+                    console.log("3. IMDB Rating: " + movieData.imdbRating);
+                    console.log("4. Rotten Tomatoes Rating: " + movieData.Ratings[1].Value);
+                    console.log("5. Country: " + movieData.Country);
+                    console.log("6. Language: " + movieData.Language);
+                    console.log("7. Plot: " + movieData.Plot);
+                    console.log("8. Actors: " + movieData.Actors);
+                    console.log("=============================================================");
+                    console.log(" ");
+                } else {
+                    console.log("No results found " + err)
+                }
+            });
     }
-    var queryURL = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=trilogy";
-    request(queryURL, function (err, response, body) {
-        // If no error and request is successful, parse the data to become an object
-        if (!err && response.statusCode == 200) {
-            var content = JSON.parse(body);
-            console.log(" ");
-            console.log("=====================| MY MOVIE RESULT |=====================");
-            console.log("1. Title: " + content.Title);
-            console.log("2. Release Year: " + content.Year);
-            console.log("3. IMDB Rating: " + content.imdbRating);
-            console.log("4. Rotten Tomatoes Rating: " + content.Ratings[1].Value);
-            console.log("5. Country: " + content.Country);
-            console.log("6. Language: " + content.Language);
-            console.log("7. Plot: " + content.Plot);
-            console.log("8. Actors: " + content.Actors);
-            console.log("=============================================================");
-            console.log(" ");
-        } else {
-            console.log("No results found " + err)
-        }
-    });
 };
+
 
 /* --- DO WHAT IT SAYS --- */
 // Command line: `node liri.js do-what-it-says`
@@ -187,10 +190,8 @@ function random() {
 };
 
 
-/* --- BONUS (attempted) --- */
-// function outputData(dataLog) {
-//     // Append each command ran to the log.txt file
-//     fs.appendFile("./log.txt", dataLog + function (err) {
-//         if (err) return outputData("Error logging data to file: " + err);
-//     });
-// }
+/* ------------ *\
+|* Main Process *|
+\* ------------ */
+
+switchCase(command);
