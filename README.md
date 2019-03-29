@@ -51,7 +51,7 @@ node liri.js do-what-it-says
 
 # License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/xmkchen/liri-node-app/blob/master/LICENSE) file for details.      
 
 # Acknowledgement
 
